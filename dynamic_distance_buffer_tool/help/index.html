@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Dynamic Distance Buffer Tool — Help</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; color: #333; line-height: 1.6; }
+        h1 { color: #2E5E4E; border-bottom: 2px solid #2E5E4E; padding-bottom: 0.3rem; }
+        h2 { color: #3A7D6A; margin-top: 2rem; }
+        code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        pre { background: #f8f8f8; padding: 1rem; border-radius: 6px; overflow-x: auto; border: 1px solid #e0e0e0; }
+        table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+        th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+        th { background: #f0f7f4; }
+        .tip { background: #e8f5e9; border-left: 4px solid #4caf50; padding: 0.8rem 1rem; margin: 1rem 0; border-radius: 0 4px 4px 0; }
+        .warn { background: #fff3e0; border-left: 4px solid #ff9800; padding: 0.8rem 1rem; margin: 1rem 0; border-radius: 0 4px 4px 0; }
+    </style>
+</head>
+<body>
+
+<h1>Dynamic Distance Buffer Tool</h1>
+<p>Generate multiple concentric buffer rings at user-defined dynamic distances around any vector features.</p>
+
+<h2>Quick Start</h2>
+<ol>
+    <li>Open the tool from <strong>Processing Toolbox &rarr; Proximity Analysis &rarr; Dynamic Distance Buffer</strong>, or click the toolbar button.</li>
+    <li>Select an input layer (point, line, or polygon).</li>
+    <li>Enter distances as a comma-separated list, e.g. <code>500,1000,2000,5000</code>.</li>
+    <li>Choose your unit, ring type, and click <strong>Run</strong>.</li>
+</ol>
+
+<h2>Parameters</h2>
+<table>
+    <tr><th>Parameter</th><th>Description</th></tr>
+    <tr><td><strong>Input layer</strong></td><td>Any vector layer with point, line, or polygon geometries.</td></tr>
+    <tr><td><strong>Distances</strong></td><td>Comma-separated positive numbers. Example: <code>500,1000,2000</code></td></tr>
+    <tr><td><strong>Distance field</strong></td><td>Optional. Select a numeric field to read distances dynamically from the attribute table. Overrides manual distances.</td></tr>
+    <tr><td><strong>Distance unit</strong></td><td>Meters, Kilometers, Miles, Feet, or Nautical Miles.</td></tr>
+    <tr><td><strong>Ring type</strong></td><td><em>Rings</em> &mdash; non-overlapping donuts. <em>Discs</em> &mdash; cumulative overlapping buffers.</td></tr>
+    <tr><td><strong>Dissolve</strong></td><td>Merge all features sharing the same distance band into one multipart feature.</td></tr>
+    <tr><td><strong>Segments</strong></td><td>Segments per quarter-circle. Higher = smoother curves, slower processing.</td></tr>
+    <tr><td><strong>End cap style</strong></td><td>Round, Flat, or Square end caps (relevant for line inputs).</td></tr>
+</table>
+
+<h2>Ring Types Explained</h2>
+<h3>Rings (Non-overlapping Donuts)</h3>
+<p>Each ring represents only the area between consecutive distance thresholds. Ring 1 covers 0&ndash;500 m, Ring 2 covers 500&ndash;1000 m, and so on. No geometry overlap.</p>
+
+<h3>Discs (Cumulative)</h3>
+<p>Each disc is a full buffer from the source feature. Disc 1 covers 0&ndash;500 m, Disc 2 covers 0&ndash;1000 m. Geometries overlap.</p>
+
+<h2>Output Attributes</h2>
+<table>
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+    <tr><td><code>ring_id</code></td><td>Integer</td><td>Sequential ring number (1 = innermost).</td></tr>
+    <tr><td><code>source_fid</code></td><td>Long</td><td>Feature ID of the original input feature. -1 when dissolved.</td></tr>
+    <tr><td><code>dist_inner</code></td><td>Double</td><td>Inner boundary distance.</td></tr>
+    <tr><td><code>dist_outer</code></td><td>Double</td><td>Outer boundary distance.</td></tr>
+    <tr><td><code>distance</code></td><td>Double</td><td>Nominal buffer distance for this ring.</td></tr>
+</table>
+
+<h2>Using in PyQGIS</h2>
+<pre><code>import processing
+
+result = processing.run('dynamicdistancebuffer:dynamicdistancebuffer', {
+    'INPUT': 'path/to/layer.gpkg',
+    'DISTANCES': '500,1000,2000,5000',
+    'DISTANCE_UNIT': 0,
+    'RING_TYPE': 0,
+    'DISSOLVE': True,
+    'SEGMENTS': 36,
+    'OUTPUT': 'memory:'
+})</code></pre>
+
+<div class="tip">
+    <strong>Tip:</strong> The algorithm is fully compatible with the QGIS Graphical Modeler. Drag it from the toolbox into any model.
+</div>
+
+<div class="warn">
+    <strong>CRS Warning:</strong> For accurate metric buffers, always use a <em>projected</em> coordinate system (e.g. UTM). If your layer uses WGS 84 (EPSG:4326), buffer distances are interpreted as degrees and results will be distorted.
+</div>
+
+<h2>Tips</h2>
+<ul>
+    <li>Use the <strong>Distance field</strong> option to create variable-radius buffers where each feature gets its own set of distances.</li>
+    <li>Increase <strong>Segments</strong> to 72 or higher for publication-quality smooth circles.</li>
+    <li>Enable <strong>Dissolve</strong> when buffering many features to reduce the output feature count.</li>
+</ul>
+
+</body>
+</html>

@@ -1,0 +1,26 @@
+[general]
+name=Dynamic Distance Buffer Tool
+qgisMinimumVersion=3.22
+description=Generate multiple concentric buffer rings at dynamic user-defined distances.
+version=1.0.0
+author=Ben Emunah Aikins
+email=benaikins56@gmail.com
+about=Creates non-overlapping ring (donut) or cumulative disc buffers around
+    point, line, or polygon features. Distances can be entered manually as a
+    comma-separated list or read dynamically from a numeric attribute field.
+    Fully integrated with the QGIS Processing Framework.
+tracker=https://github.com/Prymtym4eva/dynamic_distance_buffer/issues
+repository=https://github.com/Prymtym4eva/dynamic_distance_buffer
+tags=buffer,ring,multiple,concentric,proximity,donut,analysis,dynamic,distance
+homepage=https://github.com/Prymtym4eva/dynamic_distance_buffer
+category=Analysis
+icon=resources/icon.png
+experimental=False
+deprecated=False
+hasProcessingProvider=yes
+changelog=
+    1.0.0 - Initial release
+        - Manual and field-based dynamic distances
+        - Ring (donut) and disc (cumulative) modes
+        - Dissolve by distance band
+        - Processing Framework integration
